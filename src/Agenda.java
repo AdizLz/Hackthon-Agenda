@@ -1,95 +1,119 @@
+import java.util.Arrays;
+import java.util.Comparator;
+
 public class Agenda {
     private Contacto[] contactos;
     private int tamanio;
 
-    // Constructor con tamaño por defecto
     public Agenda() {
         this.tamanio = 10;
         this.contactos = new Contacto[tamanio];
     }
 
-    // Constructor con tamaño personalizado
     public Agenda(int tamanio) {
         this.tamanio = tamanio;
         this.contactos = new Contacto[tamanio];
     }
 
-    // Añade un contacto si hay espacio y no existe ya
     public void añadirContacto(Contacto c) {
         if (agendaLlena()) {
-            System.out.println("No se puede añadir: la agenda está llena.");
+            System.out.println("[ERROR] No se puede añadir: la agenda está llena.");
             return;
         }
+
         if (existeContacto(c)) {
-            System.out.println("Ya existe un contacto con ese nombre.");
+            System.out.println("[ERROR] Ya existe un contacto con ese nombre y apellido.");
             return;
         }
+
         for (int i = 0; i < tamanio; i++) {
             if (contactos[i] == null) {
                 contactos[i] = c;
-                System.out.println("Contacto añadido.");
+                System.out.println("[OK] Contacto añadido correctamente.");
                 return;
             }
         }
     }
 
-    // Indica si el contacto existe
     public boolean existeContacto(Contacto c) {
         for (Contacto contacto : contactos) {
-            if (contacto != null && contacto.equals(c)) return true;
+            if (contacto != null && contacto.equals(c)) {
+                return true;
+            }
         }
         return false;
     }
 
-    // Lista todos los contactos
     public void listarContactos() {
-        System.out.println("\n--- Agenda ---");
-        boolean hayContactos = false;
-        for (Contacto c : contactos) {
-            if (c != null) {
-                System.out.println(c);
-                hayContactos = true;
-            }
+        Contacto[] contactosOrdenados = Arrays.stream(contactos)
+                .filter(contacto -> contacto != null)
+                .sorted(Comparator
+                        .comparing(Contacto::getNombre, String.CASE_INSENSITIVE_ORDER)
+                        .thenComparing(Contacto::getApellido, String.CASE_INSENSITIVE_ORDER))
+                .toArray(Contacto[]::new);
+
+        if (contactosOrdenados.length == 0) {
+            System.out.println("[INFO] La agenda está vacía.");
+            return;
         }
-        if (!hayContactos) System.out.println("La agenda está vacía.");
-        System.out.println("----------------\n");
+
+        for (Contacto contacto : contactosOrdenados) {
+            System.out.println(contacto);
+        }
     }
 
-    // Busca por nombre y muestra teléfono
-    public void buscaContacto(String nombre) {
+    public void buscaContacto(String nombre, String apellido) {
         for (Contacto c : contactos) {
-            if (c != null && c.getNombre().equalsIgnoreCase(nombre)) {
-                System.out.println("Teléfono de " + nombre + ": " + c.getTelefono());
+            if (c != null
+                    && c.getNombre().equalsIgnoreCase(nombre)
+                    && c.getApellido().equalsIgnoreCase(apellido)) {
+                System.out.println("[OK] Teléfono de " + c.getNombre() + " " + c.getApellido() + ": " + c.getTelefono());
                 return;
             }
         }
-        System.out.println("No se encontró ningún contacto con ese nombre.");
+
+        System.out.println("[INFO] No se encontró ningún contacto con ese nombre y apellido.");
     }
 
-    // Elimina un contacto
-    public void eliminarContacto(String nombre) {
+    public void eliminarContacto(Contacto contactoEliminar) {
         for (int i = 0; i < tamanio; i++) {
-            if (contactos[i] != null &&
-                    contactos[i].getNombre().equalsIgnoreCase(nombre)) {
+            if (contactos[i] != null && contactos[i].equals(contactoEliminar)) {
                 contactos[i] = null;
-                System.out.println("Contacto eliminado.");
+                System.out.println("[OK] Contacto eliminado correctamente.");
                 return;
             }
         }
-        System.out.println("No se encontró el contacto para eliminar.");
+
+        System.out.println("[INFO] No se encontró el contacto para eliminar.");
     }
 
-    // Indica si la agenda está llena
+    public void modificarTelefono(String nombre, String apellido, String nuevoTelefono) {
+        for (Contacto c : contactos) {
+            if (c != null
+                    && c.getNombre().equalsIgnoreCase(nombre)
+                    && c.getApellido().equalsIgnoreCase(apellido)) {
+                c.setTelefono(nuevoTelefono);
+                System.out.println("[OK] Teléfono actualizado correctamente.");
+                return;
+            }
+        }
+
+        System.out.println("[INFO] No se encontró el contacto para modificar.");
+    }
+
     public boolean agendaLlena() {
         return espaciosLibres() == 0;
     }
 
-    // Indica cuántos espacios libres hay
     public int espaciosLibres() {
         int libres = 0;
+
         for (Contacto c : contactos) {
-            if (c == null) libres++;
+            if (c == null) {
+                libres++;
+            }
         }
+
         return libres;
     }
 }
