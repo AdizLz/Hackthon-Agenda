@@ -61,6 +61,7 @@ public class VentanaAgenda extends JFrame {
         JButton btnEliminar = new JButton("Eliminar");
         JButton btnModificar = new JButton("Modificar");
         JButton btnEstado = new JButton("Estado");
+        JButton btnLimpiar = new JButton("Limpiar");
         JButton btnSalir = new JButton("Salir");
 
         btnAgregar.addActionListener(e -> {
@@ -86,6 +87,7 @@ public class VentanaAgenda extends JFrame {
                         "Contacto agregado correctamente"
                 );
 
+
                 txtNombre.setText("");
                 txtApellido.setText("");
                 txtTelefono.setText("");
@@ -101,43 +103,35 @@ public class VentanaAgenda extends JFrame {
         });
 
         btnBuscar.addActionListener(e -> {
-            areaResultados.append(
-                    "Buscando: "
-                            + txtNombre.getText()
-                            + " "
-                            + txtApellido.getText()
-                            + "\n"
-            );
-
-            agenda.buscaContacto(
-                    txtNombre.getText(),
-                    txtApellido.getText()
-            );
+            String resultado =
+                    agenda.buscaContacto(
+                            txtNombre.getText().trim(),
+                            txtApellido.getText().trim()
+                    );
+            areaResultados.append(resultado + "\n");
         });
 
+
         btnListar.addActionListener(e -> {
-            areaResultados.append("Listando contactos...\n");
-            agenda.listarContactos();
+            areaResultados.setText("");
+            areaResultados.append(
+                    agenda.listarContactos()
+            );
         });
 
         btnEliminar.addActionListener(e -> {
             try {
-                agenda.eliminarContacto(
-                        new Contacto(
-                                txtNombre.getText(),
-                                txtApellido.getText(),
-                                "0"
-                        )
-                );
+                String resultado =
+                        agenda.eliminarContacto(
+                                new Contacto(
+                                        txtNombre.getText().trim(),
+                                        txtApellido.getText().trim(),
+                                        "0"
+                                )
+                        );
 
-                areaResultados.append(
-                        "Intentando eliminar: "
-                                + txtNombre.getText()
-                                + " "
-                                + txtApellido.getText()
-                                + "\n"
-                );
-
+                areaResultados.append(resultado + "\n");
+                limpiarResultados();
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(
                         this,
@@ -150,20 +144,13 @@ public class VentanaAgenda extends JFrame {
 
         btnModificar.addActionListener(e -> {
             try {
-                agenda.modificarTelefono(
-                        txtNombre.getText(),
-                        txtApellido.getText(),
-                        txtTelefono.getText()
-                );
-
-                areaResultados.append(
-                        "Intentando modificar teléfono de: "
-                                + txtNombre.getText()
-                                + " "
-                                + txtApellido.getText()
-                                + "\n"
-                );
-
+                String resultado =
+                        agenda.modificarTelefono(
+                                txtNombre.getText().trim(),
+                                txtApellido.getText().trim(),
+                                txtTelefono.getText().trim()
+                        );
+                areaResultados.append(resultado + "\n");
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(
                         this,
@@ -173,6 +160,11 @@ public class VentanaAgenda extends JFrame {
                 );
             }
         });
+
+
+        btnLimpiar.addActionListener(
+                e -> areaResultados.setText("")
+        );
 
         btnEstado.addActionListener(e -> {
 
@@ -186,6 +178,7 @@ public class VentanaAgenda extends JFrame {
             }
 
             areaResultados.append(mensaje + "\n");
+            limpiarResultados();
 
             JOptionPane.showMessageDialog(this, mensaje);
         });
@@ -200,6 +193,7 @@ public class VentanaAgenda extends JFrame {
         panelBotones.add(btnEliminar);
         panelBotones.add(btnModificar);
         panelBotones.add(btnEstado);
+        panelBotones.add(btnLimpiar);
         panelBotones.add(btnSalir);
 
         panelPrincipal.add(panelBotones, BorderLayout.SOUTH);
@@ -208,4 +202,10 @@ public class VentanaAgenda extends JFrame {
 
         setVisible(true);
     }
+
+    private void limpiarResultados(){
+        areaResultados.setText("");
+        txtNombre.requestFocus();
+    }
 }
+
