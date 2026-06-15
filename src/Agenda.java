@@ -1,20 +1,36 @@
+/**
+ * Gestiona un arreglo de contactos con capacidad fija.
+ * Proporciona operaciones para añadir, buscar, listar y eliminar contactos,
+ * así como consultar el estado de la agenda (llena / espacios libres).
+ */
 public class Agenda {
     private Contacto[] contactos;
     private int tamanio;
 
-    // Constructor con tamaño por defecto
+    /**
+     * Crea una agenda con capacidad predeterminada de 10 contactos.
+     */
     public Agenda() {
         this.tamanio = 10;
         this.contactos = new Contacto[tamanio];
     }
 
-    // Constructor con tamaño personalizado
+    /**
+     * Crea una agenda con una capacidad personalizada.
+     *
+     * @param tamanio Número máximo de contactos que puede contener la agenda.
+     */
     public Agenda(int tamanio) {
         this.tamanio = tamanio;
         this.contactos = new Contacto[tamanio];
     }
 
-    // Añade un contacto si hay espacio y no existe ya
+    /**
+     * Añade un contacto a la agenda si hay espacio disponible
+     * y no existe ya un contacto con el mismo nombre.
+     *
+     * @param c Contacto a añadir.
+     */
     public void añadirContacto(Contacto c) {
         if (agendaLlena()) {
             System.out.println("No se puede añadir: la agenda está llena.");
@@ -33,7 +49,12 @@ public class Agenda {
         }
     }
 
-    // Indica si el contacto existe
+    /**
+     * Verifica si un contacto ya existe en la agenda.
+     *
+     * @param c Contacto a buscar.
+     * @return {@code true} si el contacto existe.
+     */
     public boolean existeContacto(Contacto c) {
         for (Contacto contacto : contactos) {
             if (contacto != null && contacto.equals(c)) return true;
@@ -41,7 +62,10 @@ public class Agenda {
         return false;
     }
 
-    // Lista todos los contactos
+    /**
+     * Muestra en consola todos los contactos almacenados en la agenda.
+     * Si la agenda está vacía, muestra un mensaje indicándolo.
+     */
     public void listarContactos() {
         System.out.println("\n📋 --- Agenda ---");
         boolean hayContactos = false;
@@ -55,7 +79,11 @@ public class Agenda {
         System.out.println("----------------\n");
     }
 
-    // Busca por nombre y muestra teléfono
+    /**
+     * Busca un contacto por su nombre y muestra su teléfono en consola.
+     *
+     * @param nombre Nombre del contacto a buscar (no distingue mayúsculas).
+     */
     public void buscaContacto(String nombre) {
         for (Contacto c : contactos) {
             if (c != null && c.getNombre().equalsIgnoreCase(nombre)) {
@@ -66,7 +94,11 @@ public class Agenda {
         System.out.println("No se encontró ningún contacto con ese nombre.");
     }
 
-    // Elimina un contacto
+    /**
+     * Elimina un contacto de la agenda buscándolo por nombre.
+     *
+     * @param c Contacto a eliminar (se compara por nombre).
+     */
     public void eliminarContacto(Contacto c) {
         for (int i = 0; i < tamanio; i++) {
             if (contactos[i] != null && contactos[i].equals(c)) {
@@ -78,12 +110,20 @@ public class Agenda {
         System.out.println("No se encontró el contacto para eliminar.");
     }
 
-    // Indica si la agenda está llena
+    /**
+     * Indica si la agenda está completamente llena.
+     *
+     * @return {@code true} si no quedan espacios libres.
+     */
     public boolean agendaLlena() {
         return espaciosLibres() == 0;
     }
 
-    // Indica cuántos espacios libres hay
+    /**
+     * Calcula cuántos espacios libres quedan en la agenda.
+     *
+     * @return Número de posiciones vacías en el arreglo.
+     */
     public int espaciosLibres() {
         int libres = 0;
         for (Contacto c : contactos) {

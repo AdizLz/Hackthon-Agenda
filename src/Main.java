@@ -1,6 +1,17 @@
 import java.util.Scanner;
 
+/**
+ * Punto de entrada de la aplicación Agenda de Contactos.
+ * Proporciona un menú interactivo por consola para gestionar los contactos:
+ * añadir, buscar, listar, eliminar y consultar el estado de la agenda.
+ */
 public class Main {
+    /**
+     * Método principal que inicia la aplicación y ejecuta el bucle del menú
+     * hasta que el usuario elige la opción de salir.
+     *
+     * @param args Argumentos de línea de comandos (no utilizados).
+     */
     public static void main(String[] args) {
         Agenda agenda = new Agenda(); // tamaño por defecto: 10
         Scanner scanner = new Scanner(System.in);
