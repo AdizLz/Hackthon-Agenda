@@ -3,6 +3,23 @@ public class Contacto {
     private String telefono;
 
     public Contacto(String nombre, String telefono) {
+
+        if (nombre == null || nombre.trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre no puede estar vacío.");
+        }
+
+        if (!nombre.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s-]+")) {
+            throw new IllegalArgumentException("El nombre solo debe contener letras.");
+        }
+
+        if (telefono == null || telefono.trim().isEmpty()) {
+            throw new IllegalArgumentException("El teléfono no puede estar vacío.");
+        }
+
+        if (!telefono.matches("\\d+")) {
+            throw new IllegalArgumentException("El teléfono solo debe contener números.");
+        }
+
         this.nombre = nombre;
         this.telefono = telefono;
     }
