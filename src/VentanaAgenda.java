@@ -1,9 +1,13 @@
 import javax.swing.*;
 import java.awt.*;
 
+// [SOLUCIÓN - OOP / Arquitectura]: Rompes el Principio de Responsabilidad Única (SRP).
+// Tu ventana hace de Vista, de Controlador, e inicializa el Modelo todo en un solo bloque. Deberías separar esto (MVC)
+// o al menos extraer la lógica de creación de la UI a métodos privados para no tener un constructor monolítico de casi 150 líneas.
 public class VentanaAgenda extends JFrame {
 
     private JTextField txtNombre;
+    // [CRÍTICO - Estructura]: Sigues arrastrando el campo 'apellido' a la interfaz, perpetuando el error de alterar los requerimientos originales del proyecto.
     private JTextField txtApellido;
     private JTextField txtTelefono;
 
@@ -12,6 +16,9 @@ public class VentanaAgenda extends JFrame {
 
     public VentanaAgenda() {
 
+        // [SOLUCIÓN - OOP (Acoplamiento)]: Instanciar la agenda directamente aquí genera un acoplamiento duro.
+        // Si mañana tu modelo de datos cambia, tendrás que modificar la interfaz gráfica.
+        // Lo correcto en ingeniería de software es inyectar la dependencia: public VentanaAgenda(Agenda agenda)
         agenda = new Agenda();
 
         setTitle("Agenda de Contactos");
@@ -71,6 +78,9 @@ public class VentanaAgenda extends JFrame {
                         txtTelefono.getText()
                 );
 
+                // [CRÍTICO - Lógica ciega / Puntos ciegos]: Tu método añadirContacto() en Agenda retorna 'void' y hace un System.out.println() si falla (ej. agenda llena o contacto duplicado).
+                // Como ese método no lanza excepciones ni devuelve un booleano, esta línea asume erróneamente que siempre tiene éxito.
+                // Tu GUI le mentirá al usuario imprimiendo "Contacto agregado correctamente" aunque la clase Agenda lo haya rechazado.
                 agenda.añadirContacto(contacto);
 
                 areaResultados.append(
@@ -90,6 +100,8 @@ public class VentanaAgenda extends JFrame {
                 txtApellido.setText("");
                 txtTelefono.setText("");
 
+                // [SOLUCIÓN - Buenas prácticas]: Capturar 'Exception' genérica oculta errores de sistema imprevistos (NullPointer, etc).
+                // Debes capturar específicamente 'IllegalArgumentException', que es la única que lanza intencionalmente tu validación en la clase Contacto.
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(
                         this,
@@ -109,6 +121,10 @@ public class VentanaAgenda extends JFrame {
                             + "\n"
             );
 
+            // [FALLO ESTRUCTURAL FATAL - Integración]: buscaContacto() en tu clase Agenda imprime el resultado en la CONSOLA usando System.out.println.
+            // El usuario de la interfaz gráfica JAMÁS verá el teléfono de la persona en el 'areaResultados'.
+            // Una clase de lógica de negocios jamás debe interactuar con la consola si espera ser consumida por una GUI.
+            // Solución: Agenda debe retornar un String o un objeto Contacto.
             agenda.buscaContacto(
                     txtNombre.getText(),
                     txtApellido.getText()
@@ -117,11 +133,16 @@ public class VentanaAgenda extends JFrame {
 
         btnListar.addActionListener(e -> {
             areaResultados.append("Listando contactos...\n");
+
+            // [FALLO ESTRUCTURAL FATAL - Integración]: Exactamente el mismo problema. listarContactos() imprime en la consola.
+            // El JTextArea de la ventana se quedará vacío. Tu botón no hace nada visible para el usuario.
             agenda.listarContactos();
         });
 
         btnEliminar.addActionListener(e -> {
             try {
+                // [CRÍTICO - Anti-patrón]: Arrastras el parche de inyectar un objeto falso con el teléfono "0" para poder borrar.
+                // Además, eliminarContacto también retorna void e imprime a consola. La GUI asume ciegamente que se logró la acción.
                 agenda.eliminarContacto(
                         new Contacto(
                                 txtNombre.getText(),
@@ -150,6 +171,7 @@ public class VentanaAgenda extends JFrame {
 
         btnModificar.addActionListener(e -> {
             try {
+                // [FALLO ESTRUCTURAL FATAL - Integración]: Mismo problema de diseño. modificarTelefono() no avisa a la GUI si tuvo éxito o si el contacto no existía. Imprime a consola.
                 agenda.modificarTelefono(
                         txtNombre.getText(),
                         txtApellido.getText(),
@@ -175,7 +197,8 @@ public class VentanaAgenda extends JFrame {
         });
 
         btnEstado.addActionListener(e -> {
-
+            // [INFO]: Este es el ÚNICO bloque que funciona correctamente a nivel de integración entre backend y frontend,
+            // precisamente porque espaciosLibres() y agendaLlena() sí retornan valores reales (int y boolean) en lugar de imprimir a consola.
             String mensaje =
                     "Espacios libres: " + agenda.espaciosLibres();
 

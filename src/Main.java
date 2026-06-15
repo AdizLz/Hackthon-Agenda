@@ -1,5 +1,8 @@
 import java.util.Scanner;
 
+// [SOLUCIÓN - OOP / Legibilidad]: Falta documentación Javadoc de la clase. Además, usar exclusivamente
+// métodos estáticos en el Main convierte tu aplicación en programación estructurada (procedural), no orientada a objetos.
+// Solución: Crear una clase 'InterfazConsola' o 'ControladorAgenda' para manejar la vista y mantener Main solo como el punto de entrada.
 public class Main {
     public static void main(String[] args) {
         Agenda agenda = new Agenda();
@@ -71,6 +74,7 @@ public class Main {
         String telefono = leerDato(scanner, "Teléfono: ");
 
         try {
+            // [SOLUCIÓN - Camelcase]: Recuerda cambiar 'añadirContacto' a 'agregarContacto' en la clase Agenda como se indicó antes.
             agenda.añadirContacto(new Contacto(nombre, apellido, telefono));
         } catch (IllegalArgumentException e) {
             mostrarError(e.getMessage());
@@ -98,6 +102,11 @@ public class Main {
         String apellido = leerDato(scanner, "Apellido: ");
 
         try {
+            // [CRÍTICO - Buenas prácticas de OOP / Lógica débil]: Crear una instancia "dummy" pasando un teléfono falso ("0") es un hack pésimo (anti-patrón).
+            // Caso límite ignorado: Si más adelante actualizas la validación de Contacto para exigir un número de 10 dígitos,
+            // esta línea lanzará una excepción al instanciar el dummy y JAMÁS podrás eliminar un contacto.
+            // Solución: Cambiar la firma en Agenda a 'agenda.eliminarContacto(String nombre, String apellido)' para evitar
+            // crear objetos falsos solo para buscar y destruir.
             agenda.eliminarContacto(new Contacto(nombre, apellido, "0"));
         } catch (IllegalArgumentException e) {
             mostrarError(e.getMessage());
@@ -114,6 +123,10 @@ public class Main {
         try {
             agenda.modificarTelefono(nombre, apellido, nuevoTelefono);
         } catch (IllegalArgumentException e) {
+            // [SOLUCIÓN - Casos límite ignorados]: La validación del nuevo teléfono ocurre DESPUÉS de buscar dentro de 'Agenda'.
+            // Si el usuario ingresa letras aquí, iterará inútilmente sobre toda la agenda buscando a la persona, la encontrará,
+            // intentará llamar al setter, fallará lanzando la excepción y cancelará todo.
+            // Solución: Validar el formato de 'nuevoTelefono' ANTES de llamar a 'agenda.modificarTelefono'.
             mostrarError(e.getMessage());
         }
     }
