@@ -1,117 +1,68 @@
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
 public class Agenda {
-    private Contacto[] contactos;
-    private int tamanio;
+    private List<Contacto> contactos;
+    private int capacidadMaxima;
 
     public Agenda() {
-        this.tamanio = 10;
-        this.contactos = new Contacto[tamanio];
+        this(10);
     }
 
-    public Agenda(int tamanio) {
-        this.tamanio = tamanio;
-        this.contactos = new Contacto[tamanio];
+    public Agenda(int capacidadMaxima) {
+        this.capacidadMaxima = capacidadMaxima;
+        this.contactos = new ArrayList<>(capacidadMaxima);
     }
-    public void añadirContacto(Contacto c) {
+
+    public void agregarContacto(Contacto c) {
         if (agendaLlena()) {
-            throw new IllegalArgumentException(
-                    "La agenda está llena."
-            );
+            throw new IllegalStateException("No se puede añadir: la agenda está llena.");
         }
         if (existeContacto(c)) {
-            throw new IllegalArgumentException(
-                    "Ya existe un contacto con ese nombre y apellido."
-            );
+            throw new IllegalArgumentException("Ya existe un contacto con ese nombre.");
         }
-        for (int i = 0; i < tamanio; i++) {
-            if (contactos[i] == null) {
-                contactos[i] = c;
+        contactos.add(c);
+    }
+
+    public boolean existeContacto(Contacto c) {
+        return contactos.contains(c);
+    }
+
+    public List<Contacto> listarContactos() {
+        List<Contacto> copia = new ArrayList<>(contactos);
+        copia.sort(Comparator.comparing(Contacto::getNombre, String.CASE_INSENSITIVE_ORDER));
+        return copia;
+    }
+
+    public String buscaContacto(String nombre) {
+        for (Contacto c : contactos) {
+            if (c.getNombre().equalsIgnoreCase(nombre)) {
+                return c.getTelefono();
+            }
+        }
+        return null;
+    }
+
+    public boolean eliminarContacto(Contacto c) {
+        return contactos.remove(c);
+    }
+
+    public void modificarTelefono(String nombre, String nuevoTelefono) {
+        for (Contacto c : contactos) {
+            if (c.getNombre().equalsIgnoreCase(nombre)) {
+                c.setTelefono(nuevoTelefono);
                 return;
             }
         }
-    }
-    public boolean existeContacto(Contacto c) {
-        for (Contacto contacto : contactos) {
-            if (contacto != null && contacto.equals(c)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-    public String listarContactos() {
-        StringBuilder lista = new StringBuilder();
-        for (Contacto c : contactos) {
-            if (c != null) {
-                lista.append(c).append("\n");
-            }
-        }
-        if (lista.isEmpty()) {
-            return "No hay contactos registrados.";
-        }
-        return lista.toString();
-    }
-
-    public String buscaContacto(String nombre, String apellido) {
-        for (Contacto c : contactos) {
-            if (c != null &&
-                    c.getNombre().equalsIgnoreCase(nombre) &&
-                    c.getApellido().equalsIgnoreCase(apellido)) {
-
-                return "Teléfono: " + c.getTelefono();
-            }
-        }
-        return "Contacto no encontrado.";
-    }
-
-    public String eliminarContacto(Contacto c) {
-        for (int i = 0; i < tamanio; i++) {
-            if (contactos[i] != null &&
-                    contactos[i].equals(c)) {
-                contactos[i] = null;
-                return "Contacto eliminado correctamente.";
-            }
-        }
-        return "Contacto no encontrado.";
-    }
-
-    public String modificarTelefono(
-            String nombre,
-            String apellido,
-            String nuevoTelefono) {
-
-        for (Contacto c : contactos) {
-
-            if (c != null &&
-                    c.getNombre().equalsIgnoreCase(nombre) &&
-                    c.getApellido().equalsIgnoreCase(apellido)) {
-
-                c.setTelefono(nuevoTelefono);
-
-                return "Teléfono actualizado correctamente.";
-            }
-        }
-
-        return "Contacto no encontrado.";
+        throw new IllegalArgumentException("No se encontró el contacto para modificar.");
     }
 
     public boolean agendaLlena() {
-        return espaciosLibres() == 0;
+        return contactos.size() >= capacidadMaxima;
     }
 
-    public int espaciosLibres() {
-        int libres = 0;
-
-        for (Contacto c : contactos) {
-            if (c == null) {
-                libres++;
-            }
-        }
-
-        return libres;
-    }
-
-    public Contacto[] getContactos() {
-        return contactos;
+    public int espacioLibres() {
+        return capacidadMaxima - contactos.size();
     }
 }

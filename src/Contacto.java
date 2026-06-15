@@ -1,44 +1,35 @@
+import java.util.Objects;
+import java.util.regex.Pattern;
+
 public class Contacto {
     private String nombre;
-    private String apellido;
     private String telefono;
 
-    public Contacto(String nombre, String apellido, String telefono) {
-        this.nombre = nombre.trim();
-        this.apellido = apellido.trim();
-        this.telefono = telefono.trim();
+    private static final Pattern NOMBRE_PATTERN = Pattern.compile(".*[a-zA-ZáéíóúÁÉÍÓÚñÑ].*");
+    private static final Pattern TEL_PATTERN = Pattern.compile("^\\+?[0-9\\s-]{7,15}$");
 
-        validarTexto(nombre, "El nombre");
-        validarTexto(apellido, "El apellido");
+    public Contacto(String nombre, String telefono) {
+        validarNombre(nombre);
         validarTelefono(telefono);
+
+        this.nombre = nombre.trim();
+        this.telefono = telefono.trim();
     }
 
-    private void validarTexto(String texto, String campo) {
-        if (texto == null || texto.trim().isEmpty()) {
-            throw new IllegalArgumentException(campo + " no puede estar vacío.");
-        }
-
-        if (!texto.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s-]+")) {
-            throw new IllegalArgumentException(campo + " solo debe contener letras.");
+    private void validarNombre(String nombre) {
+        if (nombre == null || nombre.trim().isEmpty() || !NOMBRE_PATTERN.matcher(nombre).matches()) {
+            throw new IllegalArgumentException("El nombre es inválido o está vacío.");
         }
     }
 
     private void validarTelefono(String telefono) {
-        if (telefono == null || telefono.trim().isEmpty()) {
-            throw new IllegalArgumentException("El teléfono no puede estar vacío.");
-        }
-
-        if (!telefono.matches("\\d+")) {
-            throw new IllegalArgumentException("El teléfono solo debe contener números.");
+        if (telefono == null || telefono.trim().isEmpty() || !TEL_PATTERN.matcher(telefono).matches()) {
+            throw new IllegalArgumentException("El teléfono es inválido.");
         }
     }
 
     public String getNombre() {
         return nombre;
-    }
-
-    public String getApellido() {
-        return apellido;
     }
 
     public String getTelefono() {
@@ -56,13 +47,16 @@ public class Contacto {
         if (!(obj instanceof Contacto)) return false;
 
         Contacto otro = (Contacto) obj;
+        return this.nombre.equalsIgnoreCase(otro.nombre);
+    }
 
-        return this.nombre.equalsIgnoreCase(otro.nombre)
-                && this.apellido.equalsIgnoreCase(otro.apellido);
+    @Override
+    public int hashCode() {
+        return Objects.hash(nombre.toLowerCase());
     }
 
     @Override
     public String toString() {
-        return nombre + " " + apellido + " - " + telefono;
+        return nombre + " - " + telefono;
     }
 }

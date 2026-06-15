@@ -1,7 +1,7 @@
+import javax.swing.SwingUtilities;
+
 public class MainSwing {
-
     public static void main(String[] args) {
-        new VentanaAgenda();
+        SwingUtilities.invokeLater(() -> new VentanaAgenda(new Agenda()));
     }
-
 }
