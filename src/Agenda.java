@@ -43,7 +43,7 @@ public class Agenda {
 
     // Lista todos los contactos
     public void listarContactos() {
-        System.out.println("\n📋 --- Agenda ---");
+        System.out.println("\n--- Agenda ---");
         boolean hayContactos = false;
         for (Contacto c : contactos) {
             if (c != null) {
@@ -67,11 +67,12 @@ public class Agenda {
     }
 
     // Elimina un contacto
-    public void eliminarContacto(Contacto c) {
+    public void eliminarContacto(String nombre) {
         for (int i = 0; i < tamanio; i++) {
-            if (contactos[i] != null && contactos[i].equals(c)) {
+            if (contactos[i] != null &&
+                    contactos[i].getNombre().equalsIgnoreCase(nombre)) {
                 contactos[i] = null;
-                System.out.println("🗑️ Contacto eliminado.");
+                System.out.println("Contacto eliminado.");
                 return;
             }
         }

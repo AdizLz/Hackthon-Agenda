@@ -19,8 +19,13 @@ public class Main {
             System.out.println("╚══════════════════════════╝");
             System.out.print("Elige una opción: ");
 
-            opcion = scanner.nextInt();
-            scanner.nextLine(); // limpiar buffer
+            try {
+                opcion = Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Debes ingresar un número.");
+                opcion = -1;
+                continue;
+            } // limpiar buffer
 
             switch (opcion) {
                 case 1:
@@ -28,7 +33,11 @@ public class Main {
                     String nombre = scanner.nextLine();
                     System.out.print("Teléfono: ");
                     String tel = scanner.nextLine();
-                    agenda.añadirContacto(new Contacto(nombre, tel));
+                    try {
+                        agenda.añadirContacto(new Contacto(nombre, tel));
+                    } catch (IllegalArgumentException e) {
+                        System.out.println(e.getMessage());
+                    }
                     break;
 
                 case 2:
@@ -44,7 +53,7 @@ public class Main {
                 case 4:
                     System.out.print("Nombre a eliminar: ");
                     String eliminar = scanner.nextLine();
-                    agenda.eliminarContacto(new Contacto(eliminar, ""));
+                    agenda.eliminarContacto(eliminar);
                     break;
 
                 case 5:
