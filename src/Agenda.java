@@ -116,4 +116,8 @@ public class Agenda {
 
         return libres;
     }
+
+    public Contacto[] getContactos() {
+        return contactos;
+    }
 }
