@@ -1,12 +1,18 @@
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Punto de entrada de la aplicación. Muestra un menú por consola
+ * que permite interactuar con la Agenda: agregar, buscar, listar,
+ * eliminar y modificar contactos, además de ver el estado de espacio.
+ */
 public class Main {
     public static void main(String[] args) {
         Agenda agenda = new Agenda();
         Scanner scanner = new Scanner(System.in);
         int opcion = -1;
 
+        // Bucle principal: se repite hasta que el usuario elija la opción 0 (Salir)
         do {
             mostrarMenu();
 
@@ -14,7 +20,7 @@ public class Main {
                 opcion = Integer.parseInt(scanner.nextLine());
             } catch (NumberFormatException e) {
                 mostrarError("Debes ingresar un número válido.");
-                continue;
+                continue; // Vuelve a mostrar el menú sin intentar ejecutar ninguna opción
             }
 
             try {
@@ -29,6 +35,8 @@ public class Main {
                     default: mostrarError("Opción no válida.");
                 }
             } catch (Exception e) {
+                // Captura cualquier excepción lanzada por la Agenda o Contacto
+                // (por ejemplo, validaciones fallidas o agenda llena)
                 mostrarError(e.getMessage());
             }
 
@@ -37,6 +45,9 @@ public class Main {
         scanner.close();
     }
 
+    /**
+     * Imprime el menú de opciones disponibles para el usuario.
+     */
     private static void mostrarMenu() {
         System.out.println("\n╔════════════════════════════════╗");
         System.out.println("║       AGENDA DE CONTACTOS      ║");
@@ -52,6 +63,11 @@ public class Main {
         System.out.print("Elige una opción: ");
     }
 
+    /**
+     * Pide nombre y teléfono al usuario y agrega un nuevo contacto a la agenda.
+     * Las validaciones (formato, duplicados, capacidad) las maneja Contacto/Agenda
+     * y se propagan como excepciones hacia el bloque try-catch del main.
+     */
     private static void agregarContacto(Scanner scanner, Agenda agenda) {
         String nombre = leerDato(scanner, "Nombre: ");
         String telefono = leerDato(scanner, "Teléfono: ");
@@ -59,6 +75,9 @@ public class Main {
         mostrarExito("Contacto añadido correctamente.");
     }
 
+    /**
+     * Pide un nombre al usuario y muestra el teléfono asociado, si existe.
+     */
     private static void buscarContacto(Scanner scanner, Agenda agenda) {
         String nombre = leerDato(scanner, "Nombre: ");
         String telefono = agenda.buscaContacto(nombre);
@@ -70,6 +89,10 @@ public class Main {
         }
     }
 
+    /**
+     * Muestra todos los contactos guardados, ya ordenados alfabéticamente
+     * (el orden lo aplica Agenda.listarContactos()).
+     */
     private static void listarContactos(Agenda agenda) {
         List<Contacto> lista = agenda.listarContactos();
 
@@ -81,6 +104,12 @@ public class Main {
         }
     }
 
+    /**
+     * Pide un nombre al usuario y elimina el contacto correspondiente.
+     * Se crea un Contacto "temporal" con un teléfono cualquiera (válido)
+     * solo para poder usar equals() y localizar el contacto real por nombre,
+     * ya que la igualdad de Contacto se basa únicamente en el nombre.
+     */
     private static void eliminarContacto(Scanner scanner, Agenda agenda) {
         String nombre = leerDato(scanner, "Nombre: ");
 
@@ -91,6 +120,9 @@ public class Main {
         }
     }
 
+    /**
+     * Pide un nombre y un nuevo teléfono, y actualiza el contacto correspondiente.
+     */
     private static void modificarTelefono(Scanner scanner, Agenda agenda) {
         String nombre = leerDato(scanner, "Nombre: ");
         String nuevoTelefono = leerDato(scanner, "Nuevo teléfono: ");
@@ -98,6 +130,9 @@ public class Main {
         mostrarExito("Teléfono actualizado correctamente.");
     }
 
+    /**
+     * Muestra cuántos espacios libres quedan y si la agenda está llena o no.
+     */
     private static void mostrarEstadoAgenda(Agenda agenda) {
         System.out.println("\nEspacios libres: " + agenda.espacioLibres());
         if (agenda.agendaLlena()) {
@@ -107,15 +142,25 @@ public class Main {
         }
     }
 
+    /**
+     * Imprime un mensaje y lee la línea ingresada por el usuario.
+     * Centraliza la lectura de datos para no repetir System.out.print + scanner.nextLine().
+     */
     private static String leerDato(Scanner scanner, String mensaje) {
         System.out.print(mensaje);
         return scanner.nextLine();
     }
 
+    /**
+     * Imprime un mensaje de error con un prefijo uniforme.
+     */
     private static void mostrarError(String mensaje) {
         System.out.println("[ERROR] " + mensaje);
     }
 
+    /**
+     * Imprime un mensaje de éxito con un prefijo uniforme.
+     */
     private static void mostrarExito(String mensaje) {
         System.out.println("[OK] " + mensaje);
     }
